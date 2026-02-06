@@ -9,7 +9,6 @@ services:
     volumes:
       - openclaw_config:/home/node/.openclaw
       - openclaw_workspace:/home/node/.openclaw/workspace
-      - ./jklaw-repo:/home/node/jklaw
     networks:
       - dokploy-network
     labels:
@@ -61,7 +60,6 @@ services:
     volumes:
       - openclaw_config:/home/node/.openclaw
       - openclaw_workspace:/home/node/.openclaw/workspace
-      - ./jklaw-repo:/home/node/jklaw
     stdin_open: true
     tty: true
     init: true
