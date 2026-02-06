@@ -34,6 +34,15 @@ ENV NODE_ENV=production
 # Allow non-root user to write temp files during runtime/tests.
 RUN chown -R node:node /app
 
+# Install gh CLI and sudo for agent development
+RUN apt-get update && \
+    apt-get install -y gh sudo && \
+    usermod -aG sudo node && \
+    echo "node ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+
 # Security hardening: Run as non-root user
 # The node:22-bookworm image includes a 'node' user (uid 1000)
 # This reduces the attack surface by preventing container escape via root privileges
