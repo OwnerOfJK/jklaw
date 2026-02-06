@@ -28,8 +28,8 @@ services:
 
       - "traefik.http.services.openclaw.loadbalancer.server.port=18789"
       - "traefik.docker.network=dokploy-network"
-    mem_limit: 1g
-    mem_reservation: 512m
+    mem_limit: 2g
+    mem_reservation: 1g
     healthcheck:
       test: ["CMD-SHELL", "node -e \"const n=require('net');const s=n.createConnection(18789,'127.0.0.1',()=>{s.end();process.exit(0)});s.on('error',()=>process.exit(1))\""]
       interval: 30s
