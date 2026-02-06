@@ -14,6 +14,7 @@ import { healthHandlers } from "./server-methods/health.js";
 import { logsHandlers } from "./server-methods/logs.js";
 import { modelsHandlers } from "./server-methods/models.js";
 import { nodeHandlers } from "./server-methods/nodes.js";
+import { notesMethods } from "./server-methods/notes.js";
 import { sendHandlers } from "./server-methods/send.js";
 import { sessionsHandlers } from "./server-methods/sessions.js";
 import { skillsHandlers } from "./server-methods/skills.js";
@@ -67,6 +68,8 @@ const READ_METHODS = new Set([
   "cron.list",
   "cron.status",
   "cron.runs",
+  "notes.list",
+  "notes.read",
   "system-presence",
   "last-heartbeat",
   "node.list",
@@ -84,6 +87,7 @@ const WRITE_METHODS = new Set([
   "tts.convert",
   "tts.setProvider",
   "voicewake.set",
+  "notes.write",
   "node.invoke",
   "chat.send",
   "chat.abort",
@@ -180,6 +184,7 @@ export const coreGatewayHandlers: GatewayRequestHandlers = {
   ...systemHandlers,
   ...updateHandlers,
   ...nodeHandlers,
+  ...notesMethods,
   ...sendHandlers,
   ...usageHandlers,
   ...agentHandlers,

@@ -10,6 +10,7 @@ import { loadAgentSkills } from "./controllers/agent-skills.ts";
 import { loadAgents } from "./controllers/agents.ts";
 import { loadChannels } from "./controllers/channels.ts";
 import { loadChatHistory } from "./controllers/chat.ts";
+import { loadNotesList, loadNote, saveNote, createNote } from "./controllers/notes.ts";
 import {
   applyConfig,
   loadConfig,
@@ -1134,7 +1135,28 @@ export function renderApp(state: AppViewState) {
         ${
           state.tab === "notes"
             ? renderNotesView({
-                content: "",
+                loading: state.notesLoading,
+                files: state.notesList,
+                currentPath: state.currentNotePath,
+                currentContent: state.currentNoteContent,
+                dirty: state.notesDirty,
+                saving: state.notesSaving,
+                error: state.notesError,
+                onRefresh: () => loadNotesList(state),
+                onSelectFile: (path) => loadNote(state, path),
+                onContentChange: (content) => {
+                  state.currentNoteContent = content;
+                  state.notesDirty = content !== state.currentNoteOriginal;
+                },
+                onSave: () => saveNote(state),
+                onCreate: () => {
+                  const name = prompt("Note name (e.g., todo.md):");
+                  if (name && name.endsWith(".md")) {
+                    void createNote(state, name);
+                  } else if (name) {
+                    alert("Note name must end with .md");
+                  }
+                },
               })
             : nothing
         }
