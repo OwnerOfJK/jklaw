@@ -21,6 +21,10 @@ services:
       - "traefik.http.routers.openclaw-secure.rule=Host(`openclaw.leaf-books.com`)"
       - "traefik.http.routers.openclaw-secure.entrypoints=websecure"
       - "traefik.http.routers.openclaw-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.openclaw-secure.middlewares=openclaw-ratelimit"
+
+      - "traefik.http.middlewares.openclaw-ratelimit.ratelimit.average=50"
+      - "traefik.http.middlewares.openclaw-ratelimit.ratelimit.burst=100"
 
       - "traefik.http.services.openclaw.loadbalancer.server.port=18789"
       - "traefik.docker.network=dokploy-network"
