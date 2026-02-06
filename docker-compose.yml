@@ -65,6 +65,38 @@ services:
     init: true
     entrypoint: ["node", "dist/index.js"]
 
+  notes:
+    build:
+      context: ./notes-app
+      dockerfile: Dockerfile
+    image: notes-app:local
+    environment:
+      NOTES_DIR: /data/notes
+    volumes:
+      - openclaw_workspace:/data
+    networks:
+      - dokploy-network
+    labels:
+      - "traefik.enable=true"
+      
+      - "traefik.http.routers.notes.rule=Host(`notes.leaf-books.com`)"
+      - "traefik.http.routers.notes.entrypoints=web"
+      - "traefik.http.routers.notes.middlewares=redirect-to-https"
+      
+      - "traefik.http.routers.notes-secure.rule=Host(`notes.leaf-books.com`)"
+      - "traefik.http.routers.notes-secure.entrypoints=websecure"
+      - "traefik.http.routers.notes-secure.tls.certresolver=letsencrypt"
+      
+      - "traefik.http.services.notes.loadbalancer.server.port=3000"
+      - "traefik.docker.network=dokploy-network"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
 volumes:
   openclaw_config:
   openclaw_workspace:
