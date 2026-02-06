@@ -1,19 +1,37 @@
 services:
   openclaw-gateway:
+    build: .
     image: ${OPENCLAW_IMAGE:-openclaw:local}
     environment:
       HOME: /home/node
       TERM: xterm-256color
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
-      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY}
-      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY}
-      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE}
     volumes:
-      - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
-      - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
-    ports:
-      - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
-      - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
+      - openclaw_config:/home/node/.openclaw
+      - openclaw_workspace:/home/node/.openclaw/workspace
+    networks:
+      - dokploy-network
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.openclaw.rule=Host(`openclaw.leaf-books.com`)"
+      - "traefik.http.routers.openclaw.entrypoints=web"
+      - "traefik.http.routers.openclaw.middlewares=redirect-to-https"
+
+      - "traefik.http.routers.openclaw-secure.rule=Host(`openclaw.leaf-books.com`)"
+      - "traefik.http.routers.openclaw-secure.entrypoints=websecure"
+      - "traefik.http.routers.openclaw-secure.tls.certresolver=letsencrypt"
+
+      - "traefik.http.services.openclaw.loadbalancer.server.port=18789"
+      - "traefik.docker.network=dokploy-network"
+    mem_limit: 1g
+    mem_reservation: 512m
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"const n=require('net');const s=n.createConnection(18789,'127.0.0.1',()=>{s.end();process.exit(0)});s.on('error',()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     init: true
     restart: unless-stopped
     command:
@@ -28,19 +46,25 @@ services:
       ]
 
   openclaw-cli:
+    profiles: ["cli"]
     image: ${OPENCLAW_IMAGE:-openclaw:local}
     environment:
       HOME: /home/node
       TERM: xterm-256color
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
       BROWSER: echo
-      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY}
-      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY}
-      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE}
     volumes:
-      - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
-      - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
+      - openclaw_config:/home/node/.openclaw
+      - openclaw_workspace:/home/node/.openclaw/workspace
     stdin_open: true
     tty: true
     init: true
     entrypoint: ["node", "dist/index.js"]
+
+volumes:
+  openclaw_config:
+  openclaw_workspace:
+
+networks:
+  dokploy-network:
+    external: true
