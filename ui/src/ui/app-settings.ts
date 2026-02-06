@@ -186,10 +186,6 @@ export async function refreshActiveTab(host: SettingsHost) {
   if (host.tab === "cron") {
     await loadCron(host);
   }
-  if (host.tab === "notes") {
-    const { loadNotesList } = await import("./controllers/notes.js");
-    await loadNotesList(host as unknown as Parameters<typeof loadNotesList>[0]);
-  }
   if (host.tab === "skills") {
     await loadSkills(host as unknown as OpenClawApp);
   }
