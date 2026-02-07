@@ -79,11 +79,11 @@ services:
     labels:
       - "traefik.enable=true"
       
-      - "traefik.http.routers.notes.rule=Host(`notes.leaf-books.com`)"
+      - "traefik.http.routers.notes.rule=Host(\\`notes.leaf-books.com\\`)"
       - "traefik.http.routers.notes.entrypoints=web"
       - "traefik.http.routers.notes.middlewares=redirect-to-https"
       
-      - "traefik.http.routers.notes-secure.rule=Host(`notes.leaf-books.com`)"
+      - "traefik.http.routers.notes-secure.rule=Host(\\`notes.leaf-books.com\\`)"
       - "traefik.http.routers.notes-secure.entrypoints=websecure"
       - "traefik.http.routers.notes-secure.tls.certresolver=letsencrypt"
       
