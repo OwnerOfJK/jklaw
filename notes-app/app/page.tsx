@@ -94,6 +94,30 @@ export default function NotesPage() {
     setIsDirty(true);
   };
 
+  const deleteCurrentNote = async () => {
+    if (!currentNote) return;
+    
+    if (!confirm(`Delete "${currentNote.name}"? This cannot be undone.`)) {
+      return;
+    }
+    
+    try {
+      const res = await fetch(`/api/notes?id=${currentNote.id}`, {
+        method: 'DELETE',
+      });
+      
+      if (res.ok) {
+        setCurrentNote(null);
+        setContent('');
+        setIsDirty(false);
+        await loadNotes();
+      }
+    } catch (error) {
+      console.error('Failed to delete note:', error);
+      alert('Failed to delete note');
+    }
+  };
+
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
     setIsDirty(newContent !== currentNote?.content);
@@ -145,17 +169,25 @@ export default function NotesPage() {
           <>
             <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">{currentNote.name}</h2>
-              <button
-                onClick={saveNote}
-                disabled={!isDirty || isSaving}
-                className={`px-4 py-2 rounded-lg font-medium transition ${
-                  isDirty
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                }`}
-              >
-                {isSaving ? 'Saving...' : isDirty ? 'Save *' : 'Saved'}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={deleteCurrentNote}
+                  className="px-4 py-2 rounded-lg font-medium transition bg-red-100 text-red-700 hover:bg-red-200"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={saveNote}
+                  disabled={!isDirty || isSaving}
+                  className={`px-4 py-2 rounded-lg font-medium transition ${
+                    isDirty
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  {isSaving ? 'Saving...' : isDirty ? 'Save *' : 'Saved'}
+                </button>
+              </div>
             </div>
             
             <textarea

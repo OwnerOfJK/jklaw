@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { listNotes, getNote, saveNote } from '@/lib/notes';
+import { listNotes, getNote, saveNote, deleteNote } from '@/lib/notes';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -33,6 +33,32 @@ export async function POST(request: Request) {
   } catch (error) {
     return NextResponse.json(
       { error: 'Failed to save note' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Note ID required' },
+        { status: 400 }
+      );
+    }
+    
+    const success = await deleteNote(id);
+    if (!success) {
+      return NextResponse.json({ error: 'Failed to delete note' }, { status: 500 });
+    }
+    
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to delete note' },
       { status: 500 }
     );
   }
