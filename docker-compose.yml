@@ -86,6 +86,9 @@ services:
       - "traefik.http.routers.notes-secure.rule=Host(`notes.leaf-books.com`)"
       - "traefik.http.routers.notes-secure.entrypoints=websecure"
       - "traefik.http.routers.notes-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.notes-secure.middlewares=notes-auth"
+      
+      - "traefik.http.middlewares.notes-auth.basicauth.users=jk:$$2y$$05$$BbDowwQneBS/0VyRKfdod.5g2hqxAb996wX7S8G/Kg4s5QK6yN/3i"
       
       - "traefik.http.services.notes.loadbalancer.server.port=3000"
       - "traefik.docker.network=dokploy-network"
