@@ -17,6 +17,7 @@ export default function NotesPage() {
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(true);
 
   useEffect(() => {
     loadNotes();
@@ -41,6 +42,10 @@ export default function NotesPage() {
       setCurrentNote(note);
       setContent(note.content);
       setIsDirty(false);
+      // Hide sidebar on mobile when note is selected
+      if (window.innerWidth < 768) {
+        setShowSidebar(false);
+      }
     } catch (error) {
       console.error('Failed to load note:', error);
     }
@@ -92,6 +97,10 @@ export default function NotesPage() {
     setCurrentNote(newNote);
     setContent(initialContent);
     setIsDirty(true);
+    // Hide sidebar on mobile when creating note
+    if (window.innerWidth < 768) {
+      setShowSidebar(false);
+    }
   };
 
   const deleteCurrentNote = async () => {
@@ -111,6 +120,10 @@ export default function NotesPage() {
         setContent('');
         setIsDirty(false);
         await loadNotes();
+        // Show sidebar on mobile after delete
+        if (window.innerWidth < 768) {
+          setShowSidebar(true);
+        }
       }
     } catch (error) {
       console.error('Failed to delete note:', error);
@@ -124,9 +137,19 @@ export default function NotesPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
+      {/* Mobile back button when editor is shown */}
+      {!showSidebar && (
+        <button
+          onClick={() => setShowSidebar(true)}
+          className="md:hidden fixed top-4 left-4 z-50 bg-white rounded-lg px-3 py-2 shadow-lg border border-gray-200"
+        >
+          ← Notes
+        </button>
+      )}
+
       {/* Sidebar */}
-      <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <div className={`${showSidebar ? 'flex' : 'hidden'} md:flex w-full md:w-64 bg-white border-r border-gray-200 flex-col`}>
         <div className="p-4 border-b border-gray-200">
           <h1 className="text-xl font-bold text-gray-900">Notes</h1>
           <button
@@ -164,22 +187,22 @@ export default function NotesPage() {
       </div>
 
       {/* Editor */}
-      <div className="flex-1 flex flex-col">
+      <div className={`${!showSidebar ? 'flex' : 'hidden'} md:flex flex-1 flex-col`}>
         {currentNote ? (
           <>
-            <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">{currentNote.name}</h2>
-              <div className="flex gap-2">
+            <div className="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4 flex items-center justify-between gap-2">
+              <h2 className="text-base md:text-lg font-semibold text-gray-900 truncate">{currentNote.name}</h2>
+              <div className="flex gap-2 flex-shrink-0">
                 <button
                   onClick={deleteCurrentNote}
-                  className="px-4 py-2 rounded-lg font-medium transition bg-red-100 text-red-700 hover:bg-red-200"
+                  className="px-3 md:px-4 py-2 rounded-lg font-medium transition bg-red-100 text-red-700 hover:bg-red-200 text-sm md:text-base"
                 >
                   Delete
                 </button>
                 <button
                   onClick={saveNote}
                   disabled={!isDirty || isSaving}
-                  className={`px-4 py-2 rounded-lg font-medium transition ${
+                  className={`px-3 md:px-4 py-2 rounded-lg font-medium transition text-sm md:text-base ${
                     isDirty
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'
@@ -193,12 +216,12 @@ export default function NotesPage() {
             <textarea
               value={content}
               onChange={(e) => handleContentChange(e.target.value)}
-              className="flex-1 p-6 font-mono text-sm resize-none focus:outline-none"
+              className="flex-1 p-4 md:p-6 font-mono text-sm md:text-base resize-none focus:outline-none"
               placeholder="Start writing..."
             />
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-400">
+          <div className="flex-1 flex items-center justify-center text-gray-400 p-4 text-center">
             Select a note or create a new one
           </div>
         )}
