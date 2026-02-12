@@ -48,6 +48,14 @@ RUN apt-get update && \
 # This reduces the attack surface by preventing container escape via root privileges
 USER node
 
+# Copy and set up entrypoint for git credential helper
+COPY docker-entrypoint.sh /usr/local/bin/
+USER root
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+USER node
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+
 # Start gateway server with default config.
 # Binds to loopback (127.0.0.1) by default for security.
 #
