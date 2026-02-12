@@ -6,7 +6,7 @@ services:
       HOME: /home/node
       TERM: xterm-256color
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
-      AGENTMAIL_API_KEY: am_4d9cfc6b35e5baf6133beb1aec6369022b114fdc1ba653264ba022bb3db73f93
+      AGENTMAIL_API_KEY: ${AGENTMAIL_API_KEY}
       OBSIDIAN_VAULT: /home/node/.openclaw/workspace/memory
     volumes:
       - openclaw_config:/home/node/.openclaw
