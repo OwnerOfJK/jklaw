@@ -12,6 +12,7 @@ fi
 if [ -d "$HOME/.openclaw/jklaw-repo/.git" ]; then
     cd "$HOME/.openclaw/jklaw-repo"
     git config credential.helper '!gh auth git-credential'
+    cd /app
 fi
 
 # Execute the original command
