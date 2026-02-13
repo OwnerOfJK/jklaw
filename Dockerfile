@@ -34,11 +34,12 @@ ENV NODE_ENV=production
 # Allow non-root user to write temp files during runtime/tests.
 RUN chown -R node:node /app
 
-# Install gh CLI and sudo for agent development
+# Install gh CLI, sudo, and ClawHub for agent development
 RUN apt-get update && \
     apt-get install -y gh sudo && \
     usermod -aG sudo node && \
     echo "node ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    npm install -g clawhub && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
