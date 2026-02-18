@@ -36,6 +36,7 @@ RUN chown -R node:node /app
 
 # Install gh CLI, sudo, and ClawHub for agent development
 RUN apt-get update && \
+    apt install vim &&  \
     apt-get install -y gh sudo && \
     usermod -aG sudo node && \
     echo "node ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
